@@ -212,10 +212,10 @@ async def insult(interaction: discord.Interaction, role: discord.Role):
         allowed_mentions=discord.AllowedMentions(roles=True)
     )
 
-    await interaction.response.send_message(
-        f"Insult delivered to {target_channel.mention}.",
-        ephemeral=True
+    await target_channel.send(
+        f"{role.name}, {caller_role.name} called you **{insult}**."
     )
+
 # Message listener
 @client.event
 async def on_message(message):
