@@ -5,11 +5,12 @@ import json
 import re
 import datetime
 from discord import app_commands
+from discord.ext import tasks
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 if not TOKEN:
     raise RuntimeError("DISCORD_TOKEN is missing")
-
+PURGE_CHANNEL_ID = 1346807075153645681  # <-- channel to wipe weekly
 DATA_FILE = "dm_blocked.json"
 STONE_FILE = "stone_leaderboard.json"
 
@@ -268,6 +269,27 @@ async def on_message(message):
         await message.channel.send(
             "https://media.discordapp.net/attachments/1432125742396735532/1453363990511091762/hatto.jpg"
         )
+@tasks.loop(hours=168)  # 7 days
+async def weekly_purge():
+    channel = client.get_channel(PURGE_CHANNEL_ID)
+
+    if channel is None:
+        print("failed at censoring the bl*es")
+        return
+
+    deleted = 0
+
+    async for message in channel.history(limit=None, oldest_first=True):
+        try:
+            await message.delete()
+            deleted += 1
+        except discord.Forbidden:
+            print("the bl*es won.")
+            return
+        except discord.HTTPException:
+            pass  # rate limits / already deleted
+
+    print(f"blues: deleted {deleted} messages")
 
 client.run(TOKEN)
 
