@@ -41,6 +41,18 @@ ALLOWED_ROLE_IDS = {
     1315102680775135324,
     1238573370220740729,
 }
+ROLE_CHANNEL_MAP = {
+    # channel_id : role_id
+    1346808567130230804: 1315105809658544209,  # teal
+    1395007020163268669: 1395006533347180624,  # yellow/orange
+    1346809772070141952: 1315090029982384169,  # green
+    1346806389359775846: 1345758044499476501,  # grey
+    1346807075153645681: 1385296517975375993,  # blue
+    1346806767228555345: 1315091467127230534,  # purple
+    1346806929065771072: 1315102680775135324,  # red
+    1368902634437738617: 1238573370220740729,  # guides
+}
+
 def load_blocked_users():
     if not os.path.exists(DATA_FILE):
         return set()
@@ -145,6 +157,64 @@ async def stoneboard(interaction: discord.Interaction):
 
     await interaction.response.send_message(
         "🪨 **STONING LEADERBOARD** 🪨\n" + "\n".join(lines)
+    )
+ROLE_TO_CHANNEL = {role: channel for channel, role in ROLE_CHANNEL_MAP.items()}
+
+
+@client.tree.command(name="insult", description="Insult a color")
+@app_commands.describe(role="Role to insult")
+async def insult(interaction: discord.Interaction, role: discord.Role):
+    member = interaction.user
+
+    # Determine role1 (caller role)
+    caller_role = None
+    for r in member.roles:
+        if r.id in ROLE_TO_CHANNEL:
+            caller_role = r
+            break
+
+    if caller_role is None:
+        await interaction.response.send_message(
+            "colorless people don't have the privilege of insulting other people",
+            ephemeral=True
+        )
+        return
+
+    # Validate target role
+    if role.id not in ROLE_TO_CHANNEL:
+        await interaction.response.send_message(
+            "That color cannot be insulted.",
+            ephemeral=True
+        )
+        return
+
+    if role.id == caller_role.id:
+        await interaction.response.send_message(
+            "Friendly fire will not be tolerated",
+            ephemeral=True
+        )
+        return
+
+    target_channel_id = ROLE_TO_CHANNEL[role.id]
+    target_channel = interaction.guild.get_channel(target_channel_id)
+
+    if target_channel is None:
+        await interaction.response.send_message(
+            "Failed, contact talogne please",
+            ephemeral=True
+        )
+        return
+
+    insult = random.choice(INSULTS)
+
+    await target_channel.send(
+        f"{role.mention}, {caller_role.mention} called you **{insult}**.",
+        allowed_mentions=discord.AllowedMentions(roles=True)
+    )
+
+    await interaction.response.send_message(
+        f"Insult delivered to {target_channel.mention}.",
+        ephemeral=True
     )
 # Message listener
 @client.event
