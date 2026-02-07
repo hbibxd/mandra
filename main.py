@@ -172,21 +172,20 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     background = Image.open(background_path).convert("RGBA")
     avatar = Image.open(io.BytesIO(avatar_bytes)).convert("RGBA")
 
-    # Avatar size (tuned)
+    # Sizes
     avatar_size = 210
-    outline_size = 6  # thickness of outline
+    outline_size = 6
 
     avatar = avatar.resize((avatar_size, avatar_size))
 
-    # ---- CREATE OUTLINED AVATAR ----
+    # ---- CREATE OUTLINE ----
     total_size = avatar_size + outline_size * 2
 
-    # Outline layer
     outline = Image.new("RGBA", (total_size, total_size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(outline)
     draw.ellipse(
         (0, 0, total_size, total_size),
-        fill=(255, 255, 255, 255)  # outline color (white)
+        fill=(0, 0, 0, 255)  # BLACK outline
     )
 
     # Circular mask for avatar
@@ -198,16 +197,16 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     # Paste avatar onto outline
     outline.paste(avatar, (outline_size, outline_size), avatar)
 
-    # ---- POSITION ----
+    # ---- POSITION (LOWER) ----
     bg_w, bg_h = background.size
     position = (
         (bg_w - total_size) // 2,
-        (bg_h - total_size) // 2 + 120,
+        (bg_h - total_size) // 2 + 135,
     )
 
     background.paste(outline, position, outline)
 
-    # Output
+    # Send result
     buffer = io.BytesIO()
     background.save(buffer, format="PNG")
     buffer.seek(0)
@@ -215,6 +214,7 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     await interaction.followup.send(
         file=discord.File(buffer, filename="hug.png")
     )
+
 
 
 # /stoneboard
