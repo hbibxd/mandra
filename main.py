@@ -172,23 +172,23 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     background = Image.open(background_path).convert("RGBA")
     avatar = Image.open(io.BytesIO(avatar_bytes)).convert("RGBA")
 
-    # Sizes
+    # Sizes (locked in)
     avatar_size = 210
     outline_size = 6
 
     avatar = avatar.resize((avatar_size, avatar_size))
 
-    # ---- CREATE OUTLINE ----
+    # ---- CREATE BLACK OUTLINE ----
     total_size = avatar_size + outline_size * 2
 
     outline = Image.new("RGBA", (total_size, total_size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(outline)
     draw.ellipse(
         (0, 0, total_size, total_size),
-        fill=(0, 0, 0, 255)  # BLACK outline
+        fill=(0, 0, 0, 255)
     )
 
-    # Circular mask for avatar
+    # Circular avatar mask
     mask = Image.new("L", (avatar_size, avatar_size), 0)
     mask_draw = ImageDraw.Draw(mask)
     mask_draw.ellipse((0, 0, avatar_size, avatar_size), fill=255)
@@ -197,11 +197,11 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     # Paste avatar onto outline
     outline.paste(avatar, (outline_size, outline_size), avatar)
 
-    # ---- POSITION (LOWER) ----
+    # ---- POSITION (TINY LOWER + LEFT) ----
     bg_w, bg_h = background.size
     position = (
-        (bg_w - total_size) // 2,
-        (bg_h - total_size) // 2 + 135,
+        (bg_w - total_size) // 2 - 15,   # ← left
+        (bg_h - total_size) // 2 + 145,  # ↓ lower
     )
 
     background.paste(outline, position, outline)
