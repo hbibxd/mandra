@@ -149,8 +149,8 @@ async def stone(interaction: discord.Interaction, user: discord.User):
 async def hug(interaction: discord.Interaction, user: discord.User):
     await interaction.response.defer()
 
-    # Local image path
-    background_path = os.path.join("assets", "Mandra_Hug2.jpeg")
+    # Image is in the SAME directory as main.py
+    background_path = os.path.join(os.path.dirname(__file__), "Mandra_Hug2.jpeg")
 
     if not os.path.exists(background_path):
         await interaction.followup.send("Hug image missing on server.")
@@ -177,21 +177,22 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     avatar_size = 300
     avatar = avatar.resize((avatar_size, avatar_size))
 
-    # Circular crop
+    # Make avatar circular
     mask = Image.new("L", (avatar_size, avatar_size), 0)
     draw = ImageDraw.Draw(mask)
     draw.ellipse((0, 0, avatar_size, avatar_size), fill=255)
     avatar.putalpha(mask)
 
-    # Center placement
+    # Center avatar
     bg_w, bg_h = background.size
-    pos = (
+    position = (
         (bg_w - avatar_size) // 2,
         (bg_h - avatar_size) // 2,
     )
 
-    background.paste(avatar, pos, avatar)
+    background.paste(avatar, position, avatar)
 
+    # Save to memory
     buffer = io.BytesIO()
     background.save(buffer, format="PNG")
     buffer.seek(0)
@@ -199,7 +200,6 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     await interaction.followup.send(
         file=discord.File(buffer, filename="hug.png")
     )
-
 
 # /stoneboard
 @client.tree.command(name="stoneboard", description="View the stoning leaderboard")
