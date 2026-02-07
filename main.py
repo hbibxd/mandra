@@ -228,6 +228,11 @@ async def mandrapet(interaction: discord.Interaction):
     await interaction.response.send_message(
         "https://media.discordapp.net/attachments/1462490936490856582/1462491111921549573/MANDY_SMILE_TRANS.gif"
     )
+@client.tree.command(name="pillar", description="pillar")
+async def pillar(interaction: discord.Interaction):
+    await interaction.response.send_message(
+        "https://media.discordapp.net/attachments/586588921614303233/1446964632970596372/10N04_Mandragora.gif"
+    )
 
 # Message listener
 @client.event
