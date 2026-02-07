@@ -144,7 +144,7 @@ async def stone(interaction: discord.Interaction, user: discord.User):
         await interaction.response.send_message(
             f"{interaction.user.mention} you got parried!\n{parry_gif}"
         )
-@client.tree.command(name="hug", description="Hug another user")
+@client.tree.command(name="mandrahug", description="Hug another user")
 @app_commands.describe(user="User to hug")
 async def hug(interaction: discord.Interaction, user: discord.User):
     await interaction.response.defer()
