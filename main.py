@@ -172,26 +172,42 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     background = Image.open(background_path).convert("RGBA")
     avatar = Image.open(io.BytesIO(avatar_bytes)).convert("RGBA")
 
-    # Slightly smaller avatar
+    # Avatar size (tuned)
     avatar_size = 210
+    outline_size = 6  # thickness of outline
+
     avatar = avatar.resize((avatar_size, avatar_size))
 
-    # Circular crop
-    mask = Image.new("L", (avatar_size, avatar_size), 0)
-    draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0, avatar_size, avatar_size), fill=255)
-    avatar.putalpha(mask)
+    # ---- CREATE OUTLINED AVATAR ----
+    total_size = avatar_size + outline_size * 2
 
-    # Slightly lower placement
-    bg_w, bg_h = background.size
-    position = (
-        (bg_w - avatar_size) // 2,
-        (bg_h - avatar_size) // 2 + 120,
+    # Outline layer
+    outline = Image.new("RGBA", (total_size, total_size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(outline)
+    draw.ellipse(
+        (0, 0, total_size, total_size),
+        fill=(255, 255, 255, 255)  # outline color (white)
     )
 
-    background.paste(avatar, position, avatar)
+    # Circular mask for avatar
+    mask = Image.new("L", (avatar_size, avatar_size), 0)
+    mask_draw = ImageDraw.Draw(mask)
+    mask_draw.ellipse((0, 0, avatar_size, avatar_size), fill=255)
+    avatar.putalpha(mask)
 
-    # Send result
+    # Paste avatar onto outline
+    outline.paste(avatar, (outline_size, outline_size), avatar)
+
+    # ---- POSITION ----
+    bg_w, bg_h = background.size
+    position = (
+        (bg_w - total_size) // 2,
+        (bg_h - total_size) // 2 + 120,
+    )
+
+    background.paste(outline, position, outline)
+
+    # Output
     buffer = io.BytesIO()
     background.save(buffer, format="PNG")
     buffer.seek(0)
@@ -199,6 +215,7 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     await interaction.followup.send(
         file=discord.File(buffer, filename="hug.png")
     )
+
 
 # /stoneboard
 @client.tree.command(name="stoneboard", description="View the stoning leaderboard")
