@@ -217,6 +217,7 @@ async def hug(interaction: discord.Interaction, user: discord.User):
 
 
 
+
 # /stoneboard
 @client.tree.command(name="stoneboard", description="View the stoning leaderboard")
 async def stoneboard(interaction: discord.Interaction):
