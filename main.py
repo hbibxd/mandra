@@ -223,6 +223,12 @@ async def insult(interaction: discord.Interaction, role: discord.Role):
         f"Insult delivered to {target_channel.mention}.",
         ephemeral=True
     )
+@client.tree.command(name="mandrapet", description="mandra pet")
+async def mandrapet(interaction: discord.Interaction):
+    await interaction.response.send_message(
+        "https://media.discordapp.net/attachments/1462490936490856582/1462491111921549573/MANDY_SMILE_TRANS.gif"
+    )
+
 # Message listener
 @client.event
 async def on_message(message):
