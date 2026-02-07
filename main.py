@@ -173,7 +173,7 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     avatar = Image.open(io.BytesIO(avatar_bytes)).convert("RGBA")
 
     # Slightly smaller avatar
-    avatar_size = 220
+    avatar_size = 210
     avatar = avatar.resize((avatar_size, avatar_size))
 
     # Circular crop
@@ -186,7 +186,7 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     bg_w, bg_h = background.size
     position = (
         (bg_w - avatar_size) // 2,
-        (bg_h - avatar_size) // 2 + 110,
+        (bg_h - avatar_size) // 2 + 120,
     )
 
     background.paste(avatar, position, avatar)
@@ -199,7 +199,6 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     await interaction.followup.send(
         file=discord.File(buffer, filename="hug.png")
     )
-
 
 # /stoneboard
 @client.tree.command(name="stoneboard", description="View the stoning leaderboard")
