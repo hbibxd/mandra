@@ -149,51 +149,50 @@ async def stone(interaction: discord.Interaction, user: discord.User):
 async def hug(interaction: discord.Interaction, user: discord.User):
     await interaction.response.defer()
 
-    # Force PNG for background (avoids WebP issues on Railway)
     background_url = (
         "https://media.discordapp.net/attachments/1462490936490856582/"
         "1462490937073729780/Mandra_Hug2.jpeg?format=png"
     )
-
     avatar_url = user.display_avatar.replace(size=256, format="png").url
 
-    async with aiohttp.ClientSession() as session:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (DiscordBot)"
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(background_url) as bg_resp:
             if bg_resp.status != 200:
-                await interaction.followup.send("Failed to load hug image.")
+                await interaction.followup.send(
+                    f"Failed to load hug image (status {bg_resp.status})."
+                )
                 return
             bg_bytes = await bg_resp.read()
 
         async with session.get(avatar_url) as av_resp:
             if av_resp.status != 200:
-                await interaction.followup.send("Failed to load avatar.")
+                await interaction.followup.send(
+                    f"Failed to load avatar (status {av_resp.status})."
+                )
                 return
             avatar_bytes = await av_resp.read()
 
-    # Open images
+    # --- image processing (unchanged) ---
     background = Image.open(io.BytesIO(bg_bytes)).convert("RGBA")
     avatar = Image.open(io.BytesIO(avatar_bytes)).convert("RGBA")
 
-    # Resize avatar
     avatar_size = 300
     avatar = avatar.resize((avatar_size, avatar_size))
 
-    # Circular crop
     mask = Image.new("L", (avatar_size, avatar_size), 0)
     draw = ImageDraw.Draw(mask)
     draw.ellipse((0, 0, avatar_size, avatar_size), fill=255)
     avatar.putalpha(mask)
 
-    # Center placement
     bg_w, bg_h = background.size
-    pos = (
-        (bg_w - avatar_size) // 2,
-        (bg_h - avatar_size) // 2,
-    )
+    pos = ((bg_w - avatar_size) // 2, (bg_h - avatar_size) // 2)
 
     background.paste(avatar, pos, avatar)
 
-    # Output
     buffer = io.BytesIO()
     background.save(buffer, format="PNG")
     buffer.seek(0)
@@ -201,7 +200,6 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     await interaction.followup.send(
         file=discord.File(buffer, filename="hug.png")
     )
-
 
 # /stoneboard
 @client.tree.command(name="stoneboard", description="View the stoning leaderboard")
