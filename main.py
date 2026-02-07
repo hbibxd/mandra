@@ -173,8 +173,8 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     background = Image.open(background_path).convert("RGBA")
     avatar = Image.open(io.BytesIO(avatar_bytes)).convert("RGBA")
 
-    # Resize avatar
-    avatar_size = 300
+    # Resize avatar (SMALLER)
+    avatar_size = 240
     avatar = avatar.resize((avatar_size, avatar_size))
 
     # Make avatar circular
@@ -183,11 +183,11 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     draw.ellipse((0, 0, avatar_size, avatar_size), fill=255)
     avatar.putalpha(mask)
 
-    # Center avatar
+    # Position avatar (LOWER)
     bg_w, bg_h = background.size
     position = (
         (bg_w - avatar_size) // 2,
-        (bg_h - avatar_size) // 2,
+        (bg_h - avatar_size) // 2 + 60,
     )
 
     background.paste(avatar, position, avatar)
