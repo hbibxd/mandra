@@ -149,7 +149,6 @@ async def stone(interaction: discord.Interaction, user: discord.User):
 async def hug(interaction: discord.Interaction, user: discord.User):
     await interaction.response.defer()
 
-    # Image is in the SAME directory as main.py
     background_path = os.path.join(os.path.dirname(__file__), "Mandra_Hug2.jpeg")
 
     if not os.path.exists(background_path):
@@ -173,26 +172,26 @@ async def hug(interaction: discord.Interaction, user: discord.User):
     background = Image.open(background_path).convert("RGBA")
     avatar = Image.open(io.BytesIO(avatar_bytes)).convert("RGBA")
 
-    # Resize avatar
-    avatar_size = 240
+    # Slightly smaller avatar
+    avatar_size = 220
     avatar = avatar.resize((avatar_size, avatar_size))
 
-    # Make avatar circular
+    # Circular crop
     mask = Image.new("L", (avatar_size, avatar_size), 0)
     draw = ImageDraw.Draw(mask)
     draw.ellipse((0, 0, avatar_size, avatar_size), fill=255)
     avatar.putalpha(mask)
 
-    # Position avatar (LOWER THAN BEFORE)
+    # Slightly lower placement
     bg_w, bg_h = background.size
     position = (
         (bg_w - avatar_size) // 2,
-        (bg_h - avatar_size) // 2 + 90,
+        (bg_h - avatar_size) // 2 + 110,
     )
 
     background.paste(avatar, position, avatar)
 
-    # Save to memory
+    # Send result
     buffer = io.BytesIO()
     background.save(buffer, format="PNG")
     buffer.seek(0)
