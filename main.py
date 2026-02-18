@@ -383,7 +383,21 @@ async def weekly_purge():
             pass  # rate limits / already deleted
 
     print(f"blues: deleted {deleted} messages")
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
 
+    # --- NEW: Respond to mentions ---
+    if client.user.mentioned_in(message):
+        # Choose a random response from your GOON_MESSAGES or a new list
+        responses = [
+            "You rang, baws?",
+            "I'm here, what's up baws ?",
+            "Direct orders only, baws.",
+            "Always here baws"
+        ]
+        await message.channel.send(random.choice(responses))
 client.run(TOKEN)
 
 
